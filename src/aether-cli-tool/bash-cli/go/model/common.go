@@ -2,5 +2,5 @@ package model
 
 // Enumerated list of the commands.
 const (
-	discover_node = "discover_node"
+	Discover_node = "discover_node" // command for the node discovery.
 )
