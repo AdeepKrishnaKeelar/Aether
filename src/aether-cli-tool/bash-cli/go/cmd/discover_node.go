@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"go-logic/model"
+	"os"
+
+	_ "github.com/go-playground/validator/v10"
 )
 
 // Setting the requirements of the command.
@@ -18,10 +21,10 @@ func init() {
 }
 
 func DiscoverNode(args []string) {
-	discoverNodeFlags.Parse(args)
-	fmt.Println(model.Discover_node)
-	fmt.Println(node_ip)
-	fmt.Println(node_name)
-	fmt.Println(node_user)
-	fmt.Println(node_pass)
+	err := discoverNodeFlags.Parse(args)
+	if err != nil {
+		fmt.Printf("Error parsing flags -- %s", err)
+		os.Exit(1)
+	}
+
 }
