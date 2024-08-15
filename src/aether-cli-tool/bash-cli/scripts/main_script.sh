@@ -14,7 +14,13 @@ main_menu() {
 
 # 1. Discover Node Service
 discover_node_service() {
-    echo "discovering"
+    printf "Enter Node IP Address: "
+    read NODE_IP_ADDR
+    printf "Enter Node User: "
+    read NODE_USER
+    printf "Enter Node Pass: "
+    read NODE_PASS
+    echo "./main discover_node -ip=$NODE_IP_ADDR -user=$NODE_USER -pass=$NODE_PASS"
 }
 
 # Consider this the start point of main.
