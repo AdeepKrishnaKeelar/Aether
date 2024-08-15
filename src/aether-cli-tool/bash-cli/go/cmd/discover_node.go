@@ -7,7 +7,7 @@ import (
 	"go-logic/model"
 	"os"
 
-	_ "github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10"
 )
 
 // Setting the requirements of the command.
@@ -30,6 +30,32 @@ func validate_flag_checker_empty(mapvariables map[string]string) {
 	}
 }
 
+// Function to validate the flags are valid.
+func validate_flag_checker_valid(flags map[string]string) bool {
+	// Define a new interface for the validation and share the values.
+	validation_flags := make(map[string]interface{})
+	for key, val := range flags {
+		validation_flags[key] = val
+	}
+
+	// Define the rules for the validation of the flags.
+	rules := map[string]interface{}{
+		"node_ip":   "required,max=15,min=7,ip4_addr",
+		"node_name": "required,max=15",
+		"node_user": "required",
+		"node_pass": "required",
+	}
+
+	// Create a validator object.
+	validate := validator.New()
+	errs := validate.ValidateMap(validation_flags, rules)
+	if len(errs) > 0 {
+		fmt.Println(errs)
+		return false
+	}
+	return true
+}
+
 func DiscoverNode(args []string) {
 	// After parsing the various flags.
 	err := discoverNodeFlags.Parse(args)
@@ -50,4 +76,11 @@ func DiscoverNode(args []string) {
 	validate_flag_checker_empty(required_flag_checker)
 
 	// Let us validate further.
+	flag := validate_flag_checker_valid(required_flag_checker)
+	if flag {
+		fmt.Println("Valid Details!")
+	} else {
+		fmt.Println("Error detected in flags.")
+		os.Exit(1)
+	}
 }
