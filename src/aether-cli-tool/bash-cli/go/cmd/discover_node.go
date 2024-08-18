@@ -1,22 +1,22 @@
 package cmd
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"go-logic/commons"
 	"go-logic/model"
 	"log"
-	"net"
 	"os"
-	"time"
-
-	"golang.org/x/crypto/ssh"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/ssh"
 )
 
 // Setting the requirements of the command.
 var node_ip, node_name, node_user, node_pass string
+var node_details model.Node_Details
 var discoverNodeFlags = flag.NewFlagSet(model.Discover_node, flag.ContinueOnError)
 
 func init() {
@@ -61,47 +61,12 @@ func validate_flag_checker_valid(flags map[string]string) bool {
 	return true
 }
 
-// Helper function to validate the IP address.
-func validate_ip(ip_address string) bool {
-	// Here, we attempt to establish a TCP connection.
-	// If it fails, then either the connection to be established with is shot or the wrong IP is passed.
-	// If the nut passes something that can reach the public domain, like IP of google, then it's his problem.
-	port := "22"
-	timeout := 2 * time.Second
-
-	conn, err := net.DialTimeout("tcp", ip_address+":"+port, timeout)
-	if err != nil {
-		// This is a connection failure.
-		return false
-	}
-	defer conn.Close()
-	return true
-}
-
 // Function to fetch relevant details to be stored for better reference.
-func get_details(ip_address, user, pass string) {
-	// Create the config where we shall have an SSH session with the node to extract details.
-	// There is no need to utilize the SSH tokens, simple keys would suffice.
-	config := &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(pass),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         5 * time.Second,
-	}
-	// Establishing connection with the node.
-	conn, err := ssh.Dial("tcp", ip_address+":22", config)
+func get_hardware_details(conn *ssh.Client) {
+	// Create the SSH Session to get the Hardware Details of the device.
+	session, err := commons.Create_SSH_Session(conn)
 	if err != nil {
-		fmt.Printf("Failed to establish connection -- %s", err)
-		os.Exit(1)
-	}
-	defer conn.Close()
-
-	// Create a session.
-	session, err := conn.NewSession()
-	if err != nil {
-		log.Fatalf("Failed to create a session -- %s", err)
+		log.Fatalf(err.Error())
 		os.Exit(1)
 	}
 	defer session.Close()
@@ -112,17 +77,69 @@ func get_details(ip_address, user, pass string) {
 		log.Fatalf("Failed to get details -- %s", err)
 		os.Exit(1)
 	}
-	fmt.Println(string(details))
 
+	// temp variable to hold the complete json data.
+	/*
+		eg. {
+			"lscpu": [{
+				"field": "Architecture:",
+				"data": "x86"
+			},{
+				...
+			}
+			]
+		}
+	*/
+	var lscpu_output map[string][]map[string]string
+	err = json.Unmarshal(details, &lscpu_output)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal output -- %s", err)
+		os.Exit(1)
+	}
+	for _, item := range lscpu_output["lscpu"] {
+		switch item["field"] {
+		case "Architecture:":
+			node_details.Node_Arch = item["data"]
+		case "CPU(s):":
+			node_details.Node_CPU = item["data"]
+		case "Model name:":
+			node_details.Node_Model = item["data"]
+		}
+	}
+}
+
+func get_software_details(conn *ssh.Client) {
+	// Create the SSH Session to get the Software Details of the device.
+	session, err := commons.Create_SSH_Session(conn)
+	if err != nil {
+		log.Fatalf(err.Error())
+		os.Exit(1)
+	}
+	defer session.Close()
+	// Extract the details.
+	details, err := session.Output("lsb_release -d | awk {'print $2,$3'}")
+	if err != nil {
+		log.Fatalf("Failed to get OS details -- %s", err)
+		os.Exit(1)
+	}
+	os_det_str := strings.Fields(string(details))
+	node_details.Node_OS = os_det_str[0]
+	node_details.Node_OS_Ver = os_det_str[1]
 }
 
 // Function that will confirm the details before inserting them to CDB.
 func confirm_validation(node_details map[string]string) {
 	// Validate the IP address is legit. We validated its syntax, that's it.
-	flag := validate_ip(node_details["node_ip"])
+	flag := commons.Validate_IP(node_details["node_ip"])
 	if flag {
-		fmt.Println("Success")
-		get_details(node_details["node_ip"], node_details["node_user"], node_details["node_pass"])
+		conn, err := commons.Create_SSH_Connection(node_details["node_ip"], node_details["node_user"], node_details["node_pass"])
+		if err != nil {
+			log.Fatalf(err.Error())
+			os.Exit(1)
+		}
+		defer conn.Close()
+		get_hardware_details(conn)
+		get_software_details(conn)
 	} else {
 		fmt.Println("Invalid IP or Application down!")
 		os.Exit(1)
@@ -153,6 +170,7 @@ func DiscoverNode(args []string) {
 	if flag {
 		//fmt.Println("Valid Details!")
 		confirm_validation(required_flag_checker)
+		fmt.Println(node_details)
 	} else {
 		//fmt.Println("Error detected in flags.")
 		os.Exit(1)
