@@ -8,11 +8,11 @@ const (
 // Struct for the Discovery Service
 // Sub struct for the Discovery Service
 type Node_Details struct {
-	Node_Arch   string `json:"Architecture:"`
-	Node_CPU    string
-	Node_Model  string
-	Node_OS     string
-	Node_OS_Ver string
+	Node_Arch   string `json:"Architecture"`
+	Node_CPU    string `json:"CPU"`
+	Node_Model  string `json:"Model"`
+	Node_OS     string `json:"OS"`
+	Node_OS_Ver string `json:"Version"`
 }
 
 type Node_Info struct {

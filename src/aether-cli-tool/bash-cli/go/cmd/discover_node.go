@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"go-logic/commons"
+	common_errors "go-logic/commons/errors"
+	common_helpers "go-logic/commons/helpers"
 	"go-logic/model"
 	"log"
 	"os"
@@ -18,6 +20,7 @@ import (
 var node_ip, node_name, node_user, node_pass string
 var node_details model.Node_Details
 var discoverNodeFlags = flag.NewFlagSet(model.Discover_node, flag.ContinueOnError)
+var db *sql.DB
 
 func init() {
 	discoverNodeFlags.StringVar(&node_ip, "ip", "", "Address of the Node.")
@@ -30,7 +33,7 @@ func init() {
 func validate_flag_checker_empty(mapvariables map[string]string) {
 	for key, value := range mapvariables {
 		if value == "" {
-			commons.CommonError_EmptyValue(key)
+			common_errors.CommonError_EmptyValue(key)
 		}
 	}
 }
@@ -64,7 +67,7 @@ func validate_flag_checker_valid(flags map[string]string) bool {
 // Function to fetch relevant details to be stored for better reference.
 func get_hardware_details(conn *ssh.Client) {
 	// Create the SSH Session to get the Hardware Details of the device.
-	session, err := commons.Create_SSH_Session(conn)
+	session, err := common_helpers.Create_SSH_Session(conn)
 	if err != nil {
 		log.Fatalf(err.Error())
 		os.Exit(1)
@@ -110,7 +113,7 @@ func get_hardware_details(conn *ssh.Client) {
 
 func get_software_details(conn *ssh.Client) {
 	// Create the SSH Session to get the Software Details of the device.
-	session, err := commons.Create_SSH_Session(conn)
+	session, err := common_helpers.Create_SSH_Session(conn)
 	if err != nil {
 		log.Fatalf(err.Error())
 		os.Exit(1)
@@ -130,14 +133,15 @@ func get_software_details(conn *ssh.Client) {
 // Function that will confirm the details before inserting them to CDB.
 func confirm_validation(node_details map[string]string) {
 	// Validate the IP address is legit. We validated its syntax, that's it.
-	flag := commons.Validate_IP(node_details["node_ip"])
+	flag := common_helpers.Validate_IP(node_details["node_ip"])
 	if flag {
-		conn, err := commons.Create_SSH_Connection(node_details["node_ip"], node_details["node_user"], node_details["node_pass"])
+		conn, err := common_helpers.Create_SSH_Connection(node_details["node_ip"], node_details["node_user"], node_details["node_pass"])
 		if err != nil {
 			log.Fatalf(err.Error())
 			os.Exit(1)
 		}
 		defer conn.Close()
+		// We have got the hardware and software details.
 		get_hardware_details(conn)
 		get_software_details(conn)
 	} else {
@@ -170,7 +174,38 @@ func DiscoverNode(args []string) {
 	if flag {
 		//fmt.Println("Valid Details!")
 		confirm_validation(required_flag_checker)
-		fmt.Println(node_details)
+		// We can now post the details of the struct to the DB.
+		db, err := common_helpers.Database_Connection(os.Getenv("MYSQL_DEV_IP"), os.Getenv("MYSQL_DEV_USER"), os.Getenv("MYSQL_DEV_PASS"), "Aether_DB")
+		if err != nil {
+			log.Fatalf("Error in setting connection -- %s", err)
+			os.Exit(1)
+		}
+		defer db.Close()
+		// Marshal the data.
+		jsonData, err := json.Marshal(node_details)
+		if err != nil {
+			log.Fatalf("Error in marshaling data -- %s", err)
+			os.Exit(1)
+		}
+		// Set the DB.
+		set_db, err := db.Query("USE Aether_DB")
+		if err != nil {
+			log.Fatalf("Failed to set DB -- %s", err)
+			os.Exit(1)
+		}
+		defer set_db.Close()
+
+		// Prepare the Insert query.
+		// NOTE: Make values Node_Count dynamic.
+		insert_stmt := "INSERT INTO Aether_Node VALUES (1,\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
+		//fmt.Println(insert_stmt)
+		insert_db, err := db.Query(insert_stmt)
+		if err != nil {
+			log.Fatalf("Error in running query -- %s", err)
+			os.Exit(1)
+		}
+		defer insert_db.Close()
+
 	} else {
 		//fmt.Println("Error detected in flags.")
 		os.Exit(1)

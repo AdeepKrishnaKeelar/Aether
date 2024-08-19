@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"go-logic/cmd"
 	"go-logic/model"
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -12,6 +15,13 @@ func main() {
 	// If no command is passed, then throw an error.
 	if len(os.Args) < 2 {
 		fmt.Println("command not passed, please pass the command.")
+		os.Exit(1)
+	}
+
+	// Set the global env variables.
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error in loading env variables -- %s", err)
 		os.Exit(1)
 	}
 
