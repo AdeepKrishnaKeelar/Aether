@@ -1,12 +1,12 @@
 package commons
 
 import (
-	"fmt"
+	"log"
 	"os"
 )
 
 // Function to produce Empty Value for key error.
 func CommonError_EmptyValue(key string) {
-	fmt.Printf("Empty value detected, expected for %s to have a value.", key)
-	os.Exit(1)
+	log.Printf("Empty value detected, expected for %s to have a value.", key)
+	os.Exit(120)
 }

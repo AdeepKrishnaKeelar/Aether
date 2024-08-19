@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Load the JSON data into variables.
-MAIN_MENU_FILE="menu/main-menu.json"
-CLI_ERROR_FILE="errors/cli_errors.json"
+MAIN_MENU_FILE="../menu/main-menu.json"
+CLI_ERROR_FILE="../errors/cli_errors.json"
 
 # Load the CLI_ERRORS
 CLI_INVALID_OPTION=$(jq -r '.invalid_choice' "$CLI_ERROR_FILE")
@@ -20,7 +20,7 @@ discover_node_service() {
     read NODE_USER
     printf "Enter Node Pass: "
     read NODE_PASS
-    echo "./main discover_node -ip=$NODE_IP_ADDR -user=$NODE_USER -pass=$NODE_PASS"
+    RESULT=$(go run ../go/main.go discover_node -ip=$NODE_IP_ADDR -user=$NODE_USER -pass=$NODE_PASS)
 }
 
 # Consider this the start point of main.

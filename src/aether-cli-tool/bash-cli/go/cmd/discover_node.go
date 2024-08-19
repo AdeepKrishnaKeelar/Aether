@@ -70,7 +70,7 @@ func get_hardware_details(conn *ssh.Client) {
 	session, err := common_helpers.Create_SSH_Session(conn)
 	if err != nil {
 		log.Fatalf(err.Error())
-		os.Exit(1)
+		os.Exit(110)
 	}
 	defer session.Close()
 
@@ -78,7 +78,7 @@ func get_hardware_details(conn *ssh.Client) {
 	details, err := session.Output("lscpu --json")
 	if err != nil {
 		log.Fatalf("Failed to get details -- %s", err)
-		os.Exit(1)
+		os.Exit(111)
 	}
 
 	// temp variable to hold the complete json data.
@@ -97,7 +97,7 @@ func get_hardware_details(conn *ssh.Client) {
 	err = json.Unmarshal(details, &lscpu_output)
 	if err != nil {
 		log.Fatalf("Failed to unmarshal output -- %s", err)
-		os.Exit(1)
+		os.Exit(103)
 	}
 	for _, item := range lscpu_output["lscpu"] {
 		switch item["field"] {
@@ -116,14 +116,14 @@ func get_software_details(conn *ssh.Client) {
 	session, err := common_helpers.Create_SSH_Session(conn)
 	if err != nil {
 		log.Fatalf(err.Error())
-		os.Exit(1)
+		os.Exit(110)
 	}
 	defer session.Close()
 	// Extract the details.
 	details, err := session.Output("lsb_release -d | awk {'print $2,$3'}")
 	if err != nil {
 		log.Fatalf("Failed to get OS details -- %s", err)
-		os.Exit(1)
+		os.Exit(112)
 	}
 	os_det_str := strings.Fields(string(details))
 	node_details.Node_OS = os_det_str[0]
@@ -138,15 +138,15 @@ func confirm_validation(node_details map[string]string) {
 		conn, err := common_helpers.Create_SSH_Connection(node_details["node_ip"], node_details["node_user"], node_details["node_pass"])
 		if err != nil {
 			log.Fatalf(err.Error())
-			os.Exit(1)
+			os.Exit(110)
 		}
 		defer conn.Close()
 		// We have got the hardware and software details.
 		get_hardware_details(conn)
 		get_software_details(conn)
 	} else {
-		fmt.Println("Invalid IP or Application down!")
-		os.Exit(1)
+		log.Println("Invalid IP or Application down!")
+		os.Exit(101)
 	}
 }
 
@@ -154,8 +154,8 @@ func DiscoverNode(args []string) {
 	// After parsing the various flags.
 	err := discoverNodeFlags.Parse(args)
 	if err != nil {
-		fmt.Printf("Error parsing flags -- %s", err)
-		os.Exit(1)
+		log.Printf("Error parsing flags -- %s", err)
+		os.Exit(100)
 	}
 
 	// Create a map of the flags, and validate them.
@@ -177,21 +177,21 @@ func DiscoverNode(args []string) {
 		// We can now post the details of the struct to the DB.
 		db, err := common_helpers.Database_Connection(os.Getenv("MYSQL_DEV_IP"), os.Getenv("MYSQL_DEV_USER"), os.Getenv("MYSQL_DEV_PASS"), "Aether_DB")
 		if err != nil {
-			log.Fatalf("Error in setting connection -- %s", err)
-			os.Exit(1)
+			log.Printf("Error in setting connection -- %s", err)
+			os.Exit(104)
 		}
 		defer db.Close()
 		// Marshal the data.
 		jsonData, err := json.Marshal(node_details)
 		if err != nil {
-			log.Fatalf("Error in marshaling data -- %s", err)
-			os.Exit(1)
+			log.Printf("Error in marshaling data -- %s", err)
+			os.Exit(102)
 		}
 		// Set the DB.
 		set_db, err := db.Query("USE Aether_DB")
 		if err != nil {
-			log.Fatalf("Failed to set DB -- %s", err)
-			os.Exit(1)
+			log.Printf("Failed to set DB -- %s", err)
+			os.Exit(105)
 		}
 		defer set_db.Close()
 
@@ -201,13 +201,13 @@ func DiscoverNode(args []string) {
 		//fmt.Println(insert_stmt)
 		insert_db, err := db.Query(insert_stmt)
 		if err != nil {
-			log.Fatalf("Error in running query -- %s", err)
-			os.Exit(1)
+			log.Printf("Error in running query -- %s", err)
+			os.Exit(105)
 		}
 		defer insert_db.Close()
 
 	} else {
 		//fmt.Println("Error detected in flags.")
-		os.Exit(1)
+		os.Exit(99)
 	}
 }
