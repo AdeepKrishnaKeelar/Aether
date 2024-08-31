@@ -1,1 +1,2 @@
 github.com/joho/godotenv
+github.com/go-playground/validator/v10
