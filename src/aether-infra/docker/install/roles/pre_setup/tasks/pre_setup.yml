@@ -1,0 +1,17 @@
+---
+- name: Start the Docker Pre-Installation Checks.
+  ansible.builtin.debug:
+    msg: "--------------- Pre Checks ---------------"
+
+- name: Check the Node is 64 Bit or Not.
+  ansible.builtin.shell: 
+    dpkg --print-architecture | grep -o '64'
+  register: architecture_version
+
+- name: Check the Node is 64 Bit or Not.
+  fail:
+    msg: "The Node is not 64 Bit. Please use a 64 Bit Node."
+  when: architecture_version.stdout != "64"
+
+- name: Check if the Kernel is greater than v3.10
+  
