@@ -8,11 +8,19 @@ import (
 
 // Set error codes as a const.
 const (
-	CommandNotFound       = 1
-	CommandNotPassed      = 2
-	EnvVariablesNotLoaded = 3
-	FlagsNotLoaded        = 4
-	EmptyFlagPassed       = 5
+	CommandNotFound          = 1
+	CommandNotPassed         = 2
+	EnvVariablesNotLoaded    = 3
+	FlagsNotLoaded           = 4
+	EmptyFlagPassed          = 5
+	ErrorInFlags             = 6
+	ErrorCreateSSHSession    = 7
+	NodeErrStatus            = 8
+	ErrorFailureToGetDetails = 9
+	ErrorJSONUnmarshal       = 10
+	ErrorMySQLConnectionFail = 11
+	ErrorJSONMarshal         = 12
+	ErrorMySQLQueryFail      = 13
 )
 
 type RequestError struct {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go-logic/cmd"
 	"go-logic/model"
 	"log"
 	"os"
@@ -34,6 +35,7 @@ func main() {
 	switch os.Args[1] {
 	case model.Discover_node:
 		// Call the main logic for Discover Node.
+		cmd.DiscoverNode(os.Args[2:])
 
 	default:
 		msg := os.Args[1] + " command not recognised by system."

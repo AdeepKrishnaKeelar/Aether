@@ -1,3 +1,4 @@
 github.com/joho/godotenv
 github.com/go-playground/validator/v10
 github.com/go-sql-driver/mysql
+golang.org/x/crypto/ssh
