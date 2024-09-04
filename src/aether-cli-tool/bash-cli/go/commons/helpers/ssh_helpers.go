@@ -4,6 +4,8 @@ package helpers
 
 import (
 	"fmt"
+	"go-logic/model"
+	"log"
 	"net"
 	"time"
 
@@ -21,6 +23,12 @@ func Validate_IP(ip_address string) bool {
 	conn, err := net.DialTimeout("tcp", ip_address+":"+port, timeout)
 	if err != nil {
 		// This is a connection failure.
+		msg := err
+		err = model.CallError(model.NodeErrStatus, "Unable to ping the node")
+		if err != nil {
+			fmt.Println(err)
+			log.Fatal(msg)
+		}
 		return false
 	}
 	defer conn.Close()

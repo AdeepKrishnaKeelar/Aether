@@ -26,6 +26,7 @@ import (
 // Setting the requirements of the command.
 var node_ip, node_name, node_user, node_pass string
 var discoverNodeFlags = flag.NewFlagSet(model.Discover_node, flag.ContinueOnError)
+var count = 1
 var node_details model.Node_Details
 
 // Function to validate the flags aren't empty.
@@ -258,9 +259,29 @@ func DiscoverNode(args []string) {
 		}
 		defer set_db.Close()
 
+		// Making the Node Count Dynamic.
+		count_stmt := "SELECT COUNT(*) FROM Aether_Node"
+		err = db.QueryRow(count_stmt).Scan(&count)
+		if err != nil {
+			msg := err
+			err = model.CallError(model.ErrorMySQLQueryFail, "Failed to run the query...")
+			if err != nil {
+				fmt.Println(err)
+				log.Fatal(msg)
+				os.Exit(1)
+			}
+		}
+
+		// If the count is zero, then make it one as the first entry.
+		if count == 0 {
+			count = 1
+		} else {
+			count = count + 1
+		}
+
 		// Prepare the Insert query.
 		// NOTE: Make values Node_Count dynamic.
-		insert_stmt := "INSERT INTO Aether_Node VALUES (2,\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
+		insert_stmt := "INSERT INTO Aether_Node VALUES (\"" + string(count) + "\",\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
 		//fmt.Println(insert_stmt)
 		insert_db, err := db.Query(insert_stmt)
 		if err != nil {
