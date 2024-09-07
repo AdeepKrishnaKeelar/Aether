@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-logic/cmd"
+	aetcli "go-logic/cmd/aetcli"
 	"go-logic/model"
 	"log"
 	"os"
@@ -36,6 +37,13 @@ func main() {
 	case model.Discover_node:
 		// Call the main logic for Discover Node.
 		cmd.DiscoverNode(os.Args[2:])
+
+	case model.AetCLI:
+		switch os.Args[2] {
+		case model.ListVM:
+			fmt.Println("Listing the VMs available...")
+			aetcli.ListVM()
+		}
 
 	default:
 		msg := os.Args[1] + " command not recognised by system."

@@ -4,6 +4,12 @@ package model
 // Enumerated list of the commands.
 const (
 	Discover_node = "discover_node" // command for the node discovery.
+	AetCLI        = "aetcli"        // Aether CLI for Interactive Mode.
+)
+
+// Sub Consts for AetCLI Command only.
+const (
+	ListVM = "list_vm"
 )
 
 // Struct for the Discovery Service
