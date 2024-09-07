@@ -47,6 +47,16 @@ discover_node_service() {
 
 }
 
+# CLI Mode
+cli_mode() {
+    printf "$>> "
+    read command
+
+    echo "$command"
+}
+
+
+
 main() {
     # Consider this the start point of main.
     echo "Project Aether"
@@ -59,6 +69,9 @@ main() {
         case $CHOICE in
         1)
             discover_node_service
+            ;;
+        2)
+            cli_mode
             ;;
         X)
             echo "Bye."
