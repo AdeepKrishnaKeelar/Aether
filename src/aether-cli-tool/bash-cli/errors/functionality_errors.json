@@ -1,43 +1,17 @@
 {
-    "exit_code": [
-        {
-            "1": "Command Passed Not Found. Refer to the Help."
-        },
-        {
-            "2": ""
-        },
-        {
-            "3": ""
-        },
-        {
-            "4": ""
-        },
-        {
-            "5": ""
-        },
-        {
-            "6": ""
-        },
-        {
-            "7": ""
-        },
-        {
-            "8": ""
-        },
-        {
-            "9": ""
-        },
-        {
-            "10": ""
-        },
-        {
-            "11": ""
-        },
-        {
-            "12": "Failed to Marshal the Details."
-        },
-        {
+    "exit_code": {
+            "1": "Command Passed Not Found. Refer to the Help.",
+            "2": "Command Incorrectly or Not Passed with Sufficient Args.",
+            "3": "Environment Variables Required Failed to be Loaded.",
+            "4": "Error in Loading the Values from the Flags.",
+            "5": "Empty Flag Passed.",
+            "6": "Error in Parsing Flag Details.",
+            "7": "Failed to SSH into the Node.",
+            "8": "Error From the Node. Does it Exist or is it running??",
+            "9": "Error in Getting Details from the Node.",
+            "10": "Failed to Unmarshal JSON Data.",
+            "11": "Failed to establish connection with the DB.",
+            "12": "Failed to Marshal the Details.",
             "13": "The Query Passed failed to Execute. Refer to the Logs."
-        }
-    ]
+    }
 }

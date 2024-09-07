@@ -2,6 +2,7 @@
 
 # Load the various files as variables.
 MAIN_MENU="../menu/main-menu.json"
+ERROR_JSON="../errors/functionality_errors.json"
 
 # Menu function
 menu() {
@@ -18,7 +19,7 @@ discover_node_service() {
     printf "Enter Node User: "
     read NODE_USER
     printf "Enter Node Pass: "
-    read NODE_PASS
+    read NODE_PASS # Can pass read -s NODE_PASS
     echo
     cd ../go || exit 1
 
@@ -29,9 +30,21 @@ discover_node_service() {
     if [ $exit_code -ne 0 ]; then
         echo "Program terminated!"
         echo "$output"
+        
+        # Extracting the status code from the error.
+        if [[ "$output" =~ Status\ --\ ([0-9]+) ]]; then
+            status_code=${BASH_REMATCH[1]}
+            jq -r --arg code "$status_code" '.exit_code[$code]' "$ERROR_JSON" 
+        fi
     else
         echo "Program success!"
     fi
+    
+    # Press to continue
+    echo "Click anything to continue..."
+    read -n1
+    clear
+
 }
 
 main() {

@@ -6,6 +6,11 @@
             "command": "discover_node"
         },
         {
+            "id": 2,
+            "description": "CLI -- For More Interaction with the Resources.",
+            "command": "cli"
+        },
+        {
             "id": "X",
             "description": "Exit",
             "command": "exit"
