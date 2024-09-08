@@ -9,6 +9,7 @@ import (
 	"go-logic/model"
 	"log"
 	"os"
+	"strconv"
 
 	"strings"
 
@@ -281,7 +282,7 @@ func DiscoverNode(args []string) {
 
 		// Prepare the Insert query.
 		// NOTE: Make values Node_Count dynamic.
-		insert_stmt := "INSERT INTO Aether_Node VALUES (\"" + string(count) + "\",\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
+		insert_stmt := "INSERT INTO Aether_Node VALUES (" + strconv.Itoa(count) + ",\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
 		//fmt.Println(insert_stmt)
 		insert_db, err := db.Query(insert_stmt)
 		if err != nil {
