@@ -1,3 +1,5 @@
+-- Description: This file contains the schema commands for the Aether_DB database
+-- docker run -itd --name CDB_MySQL -e MYSQL_ROOT_PASSWORD=12345 -p3306:3306 mysql:latest
 CREATE DATABASE Aether_DB;
 -- create
 CREATE TABLE Aether_Node (

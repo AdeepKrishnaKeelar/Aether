@@ -9,9 +9,101 @@
   register: architecture_version
 
 - name: Check the Node is 64 Bit or Not.
+  ansible.builtin.debug:
+    msg: "{{ architecture_version.stdout}} bits"
+
+- name: Check the Node is 64 Bit or Not.
   fail:
     msg: "The Node is not 64 Bit. Please use a 64 Bit Node."
   when: architecture_version.stdout != "64"
 
 - name: Check if the Kernel is greater than v3.10
+  ansible.builtin.shell:
+    uname -r | awk -F. '{print $1"."$2}'
+  register: kernel_version
+
+- name: Check if the Kernel is greater than v3.10
+  ansible.builtin.debug:
+    msg: "Kernel Version -- v{{ kernel_version.stdout }}"
+
+- name: Check if the Kernel is greater than v3.10
+  fail:
+    msg: "The Kernel Version is not greater than v3.10. Please upgrade the Kernel."
+  when: kernel_version.stdout < "3.10"
   
+- name: Check if the IP Tables Version is greater than v1.4
+  ansible.builtin.shell:
+    iptables --version | awk '{print $2}' | awk -F. '{print $1"."$2}' | grep -Eo '[0-9]*\.[0-9]*'
+  register: iptables_version
+
+- name: Check if the IP Tables Version is greater than v1.4
+  ansible.builtin.debug:
+    msg: "v{{ iptables_version.stdout }}"
+
+- name: Check if the IP Tables Version is greater than v1.4
+  fail:
+    msg: "The IP Tables Version is not greater than v1.4. Please upgrade the IP Tables."
+  when: iptables_version.stdout < "1.4"
+
+- name: Check if ps utility is present.
+  ansible.builtin.shell:
+    command -v ps > /dev/null 2>&1
+  register: ps_check
+  ignore_errors: true
+
+- name: Check if ps utility is present.
+  fail:
+    msg: "The ps utility is not present. Please install the ps utility."
+  when: ps_check.rc != 0
+
+- name: Check if the XZ Utility is greater than v4.9
+  ansible.builtin.shell:
+    xz --version | grep -Eo '[0-9]+(\.[0-9]+)*' | head -n1
+  register: xz_version
+
+- name: Check if the XZ Utility is greater than v4.9
+  ansible.builtin.debug:
+    msg: "v{{ xz_version.stdout }}"
+
+- name: Check if the XZ Utility is greater than v4.9
+  fail:
+    msg: "The XZ Utility Version is not greater than v4.9. Please upgrade the XZ Utility."
+  when: xz_version.stdout < "4.9"
+
+- name: Check if Git is greater than v1.7
+  ansible.builtin.shell:
+    git --version | grep -Eo '[0-9]+(\.[0-9]+)*'
+  register: git_version
+
+- name: Check if Git is greater than v1.7
+  ansible.builtin.debug:
+    msg: "v{{ git_version.stdout }}"
+
+- name: Check if Git is greater than v1.7
+  fail:
+    msg: "Git Version is not greater than v1.7. Please upgrade Git."
+  when: xz_version.stdout < "1.7"
+
+- name: Check if the Mounted Drive has Cgroup Enabled.
+  ansible.builtin.shell:
+    mount | grep cgroup > /dev/null 2>&1
+  register: cgroup_check
+  ignore_errors: true
+
+- name: Check if the Mounted Drive has Cgroup Enabled.
+  fail:
+    msg: "Cgroup is not enabled on the Mounted Drive. Please enable Cgroup."
+  when: cgroup_check.rc != 0
+
+- name: Check if Apparmor is Present.
+  ansible.builtin.shell:
+    apparmor_status > /dev/null 2>&1
+  register: apparmor_status
+  ignore_errors: true
+  become: true
+  become_user: root
+
+- name: Check if Apparmor is Present.
+  fail:
+    msg: "Apparmor is not present in this Debian System. Please install Apparmor."
+  when: apparmor_status.rc != 0
