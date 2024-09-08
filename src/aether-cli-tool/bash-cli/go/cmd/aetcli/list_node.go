@@ -3,6 +3,6 @@ package aetcli
 
 import "fmt"
 
-func ListVM() {
+func ListNode() {
 	fmt.Println("Nothing here!")
 }

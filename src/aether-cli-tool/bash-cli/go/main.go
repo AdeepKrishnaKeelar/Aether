@@ -40,9 +40,9 @@ func main() {
 
 	case model.AetCLI:
 		switch os.Args[2] {
-		case model.ListVM:
+		case model.ListNode:
 			fmt.Println("Listing the VMs available...")
-			aetcli.ListVM()
+			aetcli.ListNode()
 		}
 
 	default:

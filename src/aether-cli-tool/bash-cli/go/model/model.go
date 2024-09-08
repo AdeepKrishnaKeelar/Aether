@@ -9,7 +9,7 @@ const (
 
 // Sub Consts for AetCLI Command only.
 const (
-	ListVM = "list_vm"
+	ListNode = "list_node" // List all Nodes that are discovered and in the CDB.
 )
 
 // Struct for the Discovery Service
