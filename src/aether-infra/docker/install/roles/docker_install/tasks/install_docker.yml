@@ -1,0 +1,113 @@
+---
+- name: Check if Docker has already been setup.
+  ansible.builtin.shell:
+    docker --version
+  register: docker_existence
+  become: true
+  become_user: root
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Check if the Docker Binary has already been downloaded.
+  stat:
+    path: "/tmp/docker-{{ docker_binary_version }}.tgz"
+  register: docker_binary_downloaded
+
+# - name: Dry Run Download.
+#   ansible.builtin.debug:
+#     msg: "Downloading the Docker Binary from {{ docker_package_url }} for {{ docker_binary_arch }}."
+#   when: docker_existence.rc != 0
+
+- name: Download the Docker Binary.
+  ansible.builtin.get_url:
+    url: "{{ docker_package_url }}"
+    dest: /tmp/docker-{{ docker_binary_version }}.tgz
+  when: docker_existence.rc != 0 and not docker_binary_downloaded.stat.exists
+  become: true
+  become_user: root
+  retries: 2
+
+- name: Extract the Docker Binaries.
+  ansible.builtin.shell:
+    "tar -xzvf /tmp/docker-{{ docker_binary_version }}.tgz"
+  when: docker_existence.rc != 0
+  retries: 5
+
+- name: Move the Docker Binaries to the System Binaries.
+  ansible.builtin.shell:
+    "mv /tmp/docker/* {{ docker_install_path }}"
+  when: docker_existence.rc != 0
+  become: true
+  become_user: root
+  retries: 5
+
+- name: Setup Necessary Directories for Docker
+  ansible.builtin.file:
+    path: "/etc/docker"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: docker_existence.rc == 0
+
+- name: Setup Necessary Directories for Docker
+  ansible.builtin.file:
+    path: "/var/lib/docker"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: docker_existence.rc == 0
+
+- name: Copy the template to setup Docker at Boot.
+  template:
+    src: "docker.service.j2"
+    dest: "/etc/systemd/system/docker.service"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  become_user: root
+  when: docker_existence.rc == 0
+
+- name: Reload the Systemd Daemon.
+  ansible.builtin.systemd_service:
+    daemon_reload: yes
+  become: true
+  become_user: root
+  when: docker_existence.rc == 0
+  retries: 5
+
+- name: Ensure Docker is enabled to start at Boot.
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: yes
+    state: started
+  become: true
+  become_user: root
+  when: docker_existence.rc == 0
+
+- name: Restart Docker.
+  ansible.builtin.systemd_service:
+    name: docker
+    state: restarted
+  become: true
+  become_user: root
+  when: docker_existence.rc == 0
+  retries: 5
+
+- name: Confirm Docker Existence
+  ansible.builtin.shell:
+    docker --version
+  register: docker_version
+  become: true
+  become_user: root
+  when: docker_existence.rc == 0
+
+- name: Confirm Docker Existence
+  ansible.builtin.debug:
+    msg: "{{ docker_version.stdout }}"
+  when: docker_existence.rc == 0
