@@ -1,0 +1,4 @@
+docker_binary_version: 24.0.7
+docker_binary_arch: "aarch64" # ARM64 set as default. For x86_64, pass it at runtime.
+docker_package_url: " https://download.docker.com/linux/static/stable/{{ docker_binary_arch }}/docker-{{ docker_binary_version }}.tgz"
+docker_install_path: "/usr/bin/"
