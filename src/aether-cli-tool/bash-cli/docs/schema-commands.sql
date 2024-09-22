@@ -8,7 +8,9 @@ CREATE TABLE Aether_Node (
   Node_IP varchar(20),
   Node_User varchar(50), 
   Node_Pass varchar(100),
-  Node_Details JSON
+  Node_Details JSON,
+  Node_Type varchar(20),
+  Node_Status varchar(20)
 )
 
 -- insert
