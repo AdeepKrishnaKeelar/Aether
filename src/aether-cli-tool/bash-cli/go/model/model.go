@@ -5,12 +5,16 @@ package model
 const (
 	Discover_node = "discover_node" // command for the node discovery.
 	AetCLI        = "aetcli"        // Aether CLI for Interactive Mode.
+	AetCLI_Admin  = "aetcli-admin"  // Aether CLI in Admin Mode.
 )
 
 // Sub Consts for AetCLI Command only.
 const (
 	ListNode = "list_node" // List all Nodes that are discovered and in the CDB.
 )
+
+// Sub Consts for AetCLI_Admin Command only.
+const ()
 
 // Struct for the Discovery Service
 // Sub struct for the Discovery Service
