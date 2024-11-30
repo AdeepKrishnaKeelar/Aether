@@ -27,5 +27,5 @@ func ListNode() {
 	defer db.Close()
 	//fmt.Println("Connection to the DB established...")
 
-	statement := "SELECT Node_Name, Node_IP from Aether_Node"
+	//statement := "SELECT Node_Name, Node_IP from Aether_Node"
 }
