@@ -28,6 +28,7 @@ import (
 var node_ip, node_name, node_user, node_pass string
 var discoverNodeFlags = flag.NewFlagSet(model.Discover_node, flag.ContinueOnError)
 var count = 1
+var vm_status, vm_type string
 var node_details model.Node_Details
 
 // Function to validate the flags aren't empty.
@@ -160,6 +161,37 @@ func get_software_details(conn *ssh.Client) {
 	node_details.Node_OS_Ver = os_det_str[1]
 }
 
+// Function to get the Node Type Detail.
+func get_node_type(conn *ssh.Client) {
+	// Create the SSH Session to get the Software Details of the device.
+	session, err := helpers.Create_SSH_Session(conn)
+	if err != nil {
+		msg := err
+		err = model.CallError(model.ErrorCreateSSHSession, "Failed to create an SSH Session")
+		if err != nil {
+			fmt.Println(err)
+			log.Fatal(msg)
+			os.Exit(1)
+		}
+	}
+	defer session.Close()
+
+	// Set the Node_Type and Node_Status value.
+	command := "cat /sys/class/dmi/id/product_name"
+	details, err := session.Output(command)
+	if err != nil {
+		msg := err
+		fmt.Println("Error in getting Node Type Details...")
+		err = model.CallError(model.ErrorFailureToGetDetails, "Failed to get details of the command.")
+		if err != nil {
+			fmt.Println(err)
+			log.Fatal(msg)
+			os.Exit(1)
+		}
+	}
+	vm_type = string(details)
+}
+
 // Function that will confirm the details before inserting them to CDB.
 func confirm_validation(node_details map[string]string) {
 	// Validate the IP address is legit. We validated its syntax, that's it.
@@ -180,6 +212,7 @@ func confirm_validation(node_details map[string]string) {
 		// We have got the hardware and software details.
 		get_hardware_details(conn)
 		get_software_details(conn)
+		get_node_type(conn)
 	} else {
 		//log.Println("Invalid IP or Application down!")
 		err := model.CallError(model.NodeErrStatus, "Invalid IP Address or Node Down!")
@@ -228,6 +261,7 @@ func DiscoverNode(args []string) {
 	if flag {
 		// fmt.Println("Valid flags")
 		confirm_validation(required_flag_checker)
+		vm_status = "Active, Running"
 		// We can now post the details of the struct to the DB.
 		db, err := helpers.Database_Connection(os.Getenv("MYSQL_DEV_IP"), os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASS"), "Aether_DB")
 		if err != nil {
@@ -282,8 +316,8 @@ func DiscoverNode(args []string) {
 
 		// Prepare the Insert query.
 		// NOTE: Make values Node_Count dynamic.
-		insert_stmt := "INSERT INTO Aether_Node VALUES (" + strconv.Itoa(count) + ",\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "')"
-		//fmt.Println(insert_stmt)
+		insert_stmt := "INSERT INTO Aether_Node VALUES (" + strconv.Itoa(count) + ",\"" + node_name + "\",\"" + node_ip + "\",\"" + node_user + "\",\"" + node_pass + "\",'" + string(jsonData) + "'" + ",\"" + vm_type + "\",\"" + vm_status + "\"" + ")"
+		fmt.Println(insert_stmt)
 		insert_db, err := db.Query(insert_stmt)
 		if err != nil {
 			msg := err

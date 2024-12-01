@@ -13,6 +13,7 @@ import (
 
 func main() {
 	// If minimum number of args are not passed, then it is invalid.
+
 	if len(os.Args) < 2 {
 		err := model.CallError(model.CommandNotPassed, "Command not passed error")
 		if err != nil {
