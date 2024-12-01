@@ -2,3 +2,8 @@ github.com/joho/godotenv
 github.com/go-playground/validator/v10
 github.com/go-sql-driver/mysql
 golang.org/x/crypto/ssh
+github.com/jedib0t/go-pretty/v6
+github.com/jedib0t/go-pretty/v6/list
+github.com/jedib0t/go-pretty/v6/progress
+github.com/jedib0t/go-pretty/v6/table
+github.com/jedib0t/go-pretty/v6/text
