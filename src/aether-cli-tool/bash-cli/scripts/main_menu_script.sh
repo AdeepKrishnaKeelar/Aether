@@ -77,6 +77,9 @@ main() {
             echo "Bye."
             exit 0
             ;;
+        help)
+            echo "Help"
+            ;;
         *)
             echo "Error!!"
             ;;
