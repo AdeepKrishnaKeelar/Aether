@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <title>Aether</title>
 </head>
 <body>
-    <p>Aether</p>
+    <!-- Container for Name -->
+    <div class="container">
+        <div class="well well-lg">Aether</div>
+    </div>
+    <!-- Container for Self Created Navbar. -->
+    <div class="row">
+        <div class="col-sm-2">Configuration</div>
+        <div class="col-sm-2">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">VM<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">VM Dashboard</a></li>
+                    <li><a href="#">VM Create</a></li>
+                    <li><a href="#">VM Destroy</a></li>
+                </ul>
+        </div>
+        <div class="col-sm-2">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Containers<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Containers Dashboard</a></li>
+                <li><a href="#">Container Create</a></li>
+                <li><a href="#">Container Destroy</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-2">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Clusters<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Clusters Dashboard</a></li>
+                <li><a href="#">Cluster Create</a></li>
+                <li><a href="#">Cluster Destroy</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-2">Monitoring</div>
+        <div class="col-sm-2">Settings</div>
+    </div>
 </body>
 </html>

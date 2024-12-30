@@ -20,7 +20,7 @@ func main() {
 
 	// Serve the Index page at root path.
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/auth/login.html")
+		http.ServeFile(w, r, "./static/dashboard/index.html")
 	})
 
 	// Serve the static files.
