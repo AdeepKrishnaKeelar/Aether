@@ -10,7 +10,8 @@ const (
 
 // Sub Consts for AetCLI Command only.
 const (
-	ListNode = "list_node" // List all Nodes that are discovered and in the CDB.
+	ListNode       = "list_node"       // List all Nodes that are discovered and in the CDB.
+	SystemOverview = "system_overview" // Get the System Overview of the Platform.
 )
 
 // Sub Consts for AetCLI_Admin Command only.

@@ -3,3 +3,6 @@ discover_node:
 
 list_node:
 	go run main.go aetcli list_node
+
+system_overview:
+	go run main.go aetcli system_overview
