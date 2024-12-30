@@ -337,4 +337,6 @@ func DiscoverNode(args []string) {
 			os.Exit(1)
 		}
 	}
+
+	// TODO: Add the logic to insert the details to the Caching Layer as well.
 }
