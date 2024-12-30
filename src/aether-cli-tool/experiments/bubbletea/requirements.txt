@@ -1,0 +1,2 @@
+github.com/charmbracelet/lipgloss
+github.com/charmbracelet/bubbletea
