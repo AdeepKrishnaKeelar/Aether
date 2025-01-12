@@ -44,6 +44,10 @@ func main() {
 		case model.ListNode:
 			fmt.Println("Listing the VMs available...")
 			aetcli.ListNode()
+
+		case model.SystemOverview:
+			fmt.Println("Getting details of the System Overview...")
+			aetcli.SystemOverview()
 		}
 
 	default:

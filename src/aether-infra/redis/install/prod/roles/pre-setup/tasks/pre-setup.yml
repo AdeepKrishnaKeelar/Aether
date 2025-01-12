@@ -1,0 +1,4 @@
+---
+- name: Start Pre-Validation for Redis.
+  ansible.builtin.debug:
+    msg: "Starting Pre-Validation for Redis."

@@ -7,3 +7,7 @@ github.com/jedib0t/go-pretty/v6/list
 github.com/jedib0t/go-pretty/v6/progress
 github.com/jedib0t/go-pretty/v6/table
 github.com/jedib0t/go-pretty/v6/text
+github.com/docker/docker/client
+github.com/shirou/gopsutil
+github.com/docker/docker/api/types/container
+github.com/tklauser/go-sysconf
